@@ -2,25 +2,42 @@
 const yahooFinance = require("yahoo-finance2").default;
 
 const fetchChartData = async (symbol, interval = '1d') => {
-  const nseSymbol = symbol.toUpperCase() + ".NS";
-  const bseSymbol = symbol.toUpperCase() + ".BO";
   const period1 = new Date();
   period1.setFullYear(period1.getFullYear() - 1); // 1-year history
 
   let chartData;
+
+  // First, try using the Indian exchange formats.
+  const nseSymbol = symbol.toUpperCase() + ".NS";
+  const bseSymbol = symbol.toUpperCase() + ".BO";
+
   try {
     chartData = await yahooFinance.chart(nseSymbol, { period1, interval });
+    if (chartData) {
+      return chartData;
+    }
   } catch (error) {
-    console.log(`NSE chart lookup failed for ${nseSymbol}, trying BSE...`);
+    console.log(`NSE chart lookup failed for ${nseSymbol}: ${error.message}`);
   }
 
   if (!chartData) {
     try {
       chartData = await yahooFinance.chart(bseSymbol, { period1, interval });
+      if (chartData) {
+        return chartData;
+      }
     } catch (error) {
-      console.log(`BSE chart lookup failed for ${bseSymbol}`);
+      console.log(`BSE chart lookup failed for ${bseSymbol}: ${error.message}`);
     }
   }
+
+  // If Indian formats fail, then try a direct lookup (for US stocks).
+  try {
+    chartData = await yahooFinance.chart(symbol, { period1, interval });
+  } catch (error) {
+    console.log(`Direct chart lookup failed for ${symbol}: ${error.message}`);
+  }
+
   return chartData;
 };
 

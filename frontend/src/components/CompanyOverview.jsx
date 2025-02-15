@@ -1,10 +1,9 @@
-// src/components/CompanyOverview.jsx
 import React from 'react';
 import { Card, CardContent, Typography, CircularProgress, Alert, Link } from '@mui/material';
 import useStockDetails from '../hooks/useStockDetails';
 
-const CompanyOverview = ({ symbol }) => {
-  const { details, loading, error } = useStockDetails(symbol);
+const CompanyOverview = ({ symbol, exchange }) => {
+  const { details, loading, error } = useStockDetails(symbol, exchange);
 
   if (loading) return <CircularProgress sx={{ mt: 2 }} />;
   if (error) return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;

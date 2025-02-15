@@ -1,36 +1,28 @@
-// src/hooks/useStock.js
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 
-const useStock = (symbol) => {
+const useStock = (symbol, exchange) => {
   const [stockData, setStockData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!symbol) return; // Only fetch when a valid symbol is provided
-
+    if (!symbol) return;
     const fetchStock = async () => {
       setLoading(true);
-      setError(null); // Reset error state before fetching
+      setError(null);
       try {
-        const response = await api.get(`/stocks/${symbol}`);
+        const response = await api.get(`/stocks/${symbol}?exchange=${exchange}`);
         setStockData(response.data);
       } catch (err) {
-        console.error(err);
-        // Check if error response exists; otherwise use a generic message
-        const errorMessage =
-          err.response?.data?.error ||
-          err.message ||
-          "Error fetching stock data";
-        setError(errorMessage);
+        setError(err.response?.data?.error || "Error fetching stock data");
         setStockData(null);
       }
       setLoading(false);
     };
 
     fetchStock();
-  }, [symbol]);
+  }, [symbol, exchange]);
 
   return { stockData, loading, error };
 };
