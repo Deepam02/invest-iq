@@ -26,6 +26,7 @@
   align-items: center;
 }
 
+/* Base styles for search elements */
 .search-input {
   flex: 1;
   padding: 10px;
@@ -57,4 +58,21 @@
 
 .search-button:hover {
   background-color: #666;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 480px) {
+  .navbar-search {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .search-input,
+  .search-select,
+  .search-button {
+    width: 100%;
+  }
+  .search-button {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
 }
