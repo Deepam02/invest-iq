@@ -1,0 +1,24 @@
+.stock-card {
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .stock-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+  }
+  
+  .stock-card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #222;
+  }
+  
+  .stock-card-content {
+    font-size: 0.95rem;
+  }
+  

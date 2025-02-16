@@ -1,12 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 const InvestmentInsights = () => {
   return (
-    <div>
-      <h2>Investment Insights</h2>
-      <p>This page will display AI-powered investment insights.</p>
-    </div>
-  );
-};
+    <div>InvestmentInsights</div>
+  )
+}
 
-export default InvestmentInsights;
+export default InvestmentInsights

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import useStock from '../hooks/useStock';
-import CompanyOverview from './CompanyOverview';
+import CompanyOverview from './CompanyOverview'
 import StockChart from './StockChart';
 import {
   TextField,
@@ -14,13 +14,24 @@ import {
   MenuItem
 } from '@mui/material';
 
-const StockDashboard = () => {
-  const [inputSymbol, setInputSymbol] = useState('');
-  const [fetchSymbol, setFetchSymbol] = useState(null);
-  const [exchange, setExchange] = useState('india'); // default exchange
+const StockDashboard = ({ initialSymbol, initialExchange, hideSearch }) => {
+  // Local state for search values
+  const [inputSymbol, setInputSymbol] = useState(initialSymbol || '');
+  const [fetchSymbol, setFetchSymbol] = useState(initialSymbol || null);
+  const [exchange, setExchange] = useState(initialExchange || 'india');
+
+  // If hideSearch is true, update the local state when props change.
+  useEffect(() => {
+    if (hideSearch) {
+      setInputSymbol(initialSymbol || '');
+      setFetchSymbol(initialSymbol || null);
+      setExchange(initialExchange || 'india');
+    }
+  }, [initialSymbol, initialExchange, hideSearch]);
 
   const { stockData, loading, error } = useStock(fetchSymbol, exchange);
 
+  // This function is used only when hideSearch is false (internal search)
   const handleFetchStock = () => {
     const trimmedSymbol = inputSymbol.trim().toUpperCase();
     if (!trimmedSymbol || trimmedSymbol.length < 2) {
@@ -31,34 +42,38 @@ const StockDashboard = () => {
   };
 
   return (
-    <div>
-      <TextField
-        label="Enter Stock Symbol"
-        value={inputSymbol}
-        onChange={(e) => setInputSymbol(e.target.value)}
-        variant="outlined"
-      />
-      <FormControl variant="outlined" size="small" sx={{ ml: 2, minWidth: 120 }}>
-        <InputLabel id="exchange-label">Exchange</InputLabel>
-        <Select
-          labelId="exchange-label"
-          label="Exchange"
-          value={exchange}
-          onChange={(e) => setExchange(e.target.value)}
-        >
-          <MenuItem value="india">India</MenuItem>
-          <MenuItem value="us">US</MenuItem>
-        </Select>
-      </FormControl>
-      <Button onClick={handleFetchStock} variant="contained" color="primary" sx={{ ml: 2 }}>
-        Get Stock Info
-      </Button>
+    <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
+      { !hideSearch && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
+          <TextField
+            label="Enter Stock Symbol"
+            value={inputSymbol}
+            onChange={(e) => setInputSymbol(e.target.value)}
+            variant="outlined"
+          />
+          <FormControl variant="outlined" size="small">
+            <InputLabel id="exchange-label">Exchange</InputLabel>
+            <Select
+              labelId="exchange-label"
+              label="Exchange"
+              value={exchange}
+              onChange={(e) => setExchange(e.target.value)}
+            >
+              <MenuItem value="india">India</MenuItem>
+              <MenuItem value="us">US</MenuItem>
+            </Select>
+          </FormControl>
+          <Button onClick={handleFetchStock} variant="contained" color="primary">
+            Get Stock Info
+          </Button>
+        </div>
+      )}
 
-      {loading && <CircularProgress sx={{ mt: 2 }} />}
-      {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
 
       {stockData && (
-        <div style={{ marginTop: '20px' }}>
+        <div>
           <Typography variant="h5">
             {stockData.shortName} ({stockData.symbol})
           </Typography>
@@ -68,7 +83,6 @@ const StockDashboard = () => {
           <Typography>
             <strong>Market Cap:</strong> ₹{stockData.marketCap}
           </Typography>
-          {/* Pass the exchange value to subcomponents */}
           <StockChart symbol={fetchSymbol} exchange={exchange} />
           <CompanyOverview symbol={fetchSymbol} exchange={exchange} />
         </div>

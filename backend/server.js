@@ -4,6 +4,7 @@ const cors = require("cors");
 
 const stockRoutes = require("./routes/stockRoutes"); // your existing stock routes
 const chartRoutes = require("./routes/chartRoutes");
+const insightsRoutes = require("./routes/insightsRoutes");
 
 const app = express();
 
@@ -11,6 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // Set up routes under "/api"
+
+app.use("/api/insights", insightsRoutes);
 app.use("/api/stocks", stockRoutes);
 app.use("/api/charts", chartRoutes);
 
