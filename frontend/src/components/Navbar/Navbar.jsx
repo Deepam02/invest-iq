@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Navbar.css";
+import StockMarquee from "../StockMarquee/StockMarquee";
 
 const Navbar = ({ onSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,14 +15,17 @@ const Navbar = ({ onSearch }) => {
     onSearch(searchQuery.trim().toUpperCase(), exchange);
   };
 
+  // Check for Enter key press
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="navbar">
       <div className="marquee-container">
-        <marquee behavior="scroll" direction="left" className="marquee">
-          <span>AAPL ▲ 1,234</span>&nbsp;&nbsp;
-          <span>GOOG ▲ 2,345</span>&nbsp;&nbsp;
-          <span>TSLA ▲ 1,678</span>
-        </marquee>
+        <StockMarquee/>
       </div>
       <div className="navbar-search">
         <input
@@ -30,6 +34,7 @@ const Navbar = ({ onSearch }) => {
           placeholder="Search stocks, ETFs..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown} // Added event handler
         />
         <select
           className="search-select"
