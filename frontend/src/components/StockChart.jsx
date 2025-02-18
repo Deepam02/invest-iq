@@ -33,6 +33,9 @@ const StockChart = ({ symbol }) => {
     refreshCounter
   );
 
+  // Default to ₹ and check if USD is found in currency
+  const currencySymbol = chartData?.meta?.currency === "USD" ? "$" : "₹";
+
   // Toggle between dark and light themes
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
@@ -56,7 +59,6 @@ const StockChart = ({ symbol }) => {
   let series = [];
 
   if (chartType === "candlestick") {
-    // Prepare candlestick data (requires OHLC data in chartData.quotes)
     let seriesData = [];
     if (chartData.quotes) {
       seriesData = chartData.quotes.map((q) => ({
@@ -101,7 +103,7 @@ const StockChart = ({ symbol }) => {
       yaxis: {
         tooltip: { enabled: true },
         title: {
-          text: "Price (₹)",
+          text: `Price (${currencySymbol})`,
           style: { color: theme === "dark" ? "#fff" : "#000" },
         },
         labels: {
@@ -114,7 +116,7 @@ const StockChart = ({ symbol }) => {
         theme: theme,
         x: { format: "dd MMM yyyy" },
         y: {
-          formatter: (value) => `₹${value.toFixed(2)}`,
+          formatter: (value) => `${currencySymbol}${value.toFixed(2)}`,
         },
       },
     };
@@ -126,7 +128,6 @@ const StockChart = ({ symbol }) => {
       },
     ];
   } else if (chartType === "line") {
-    // Prepare line chart data (using closing prices)
     if (chartData.quotes) {
       const categories = chartData.quotes.map((q) => {
         const date = new Date(q.date);
@@ -158,7 +159,7 @@ const StockChart = ({ symbol }) => {
         },
         yaxis: {
           title: {
-            text: "Price (₹)",
+            text: `Price (${currencySymbol})`,
             style: { color: theme === "dark" ? "#fff" : "#000" },
           },
           labels: {
@@ -173,7 +174,7 @@ const StockChart = ({ symbol }) => {
           x: { show: true, format: "dd/MM" },
           theme: theme,
           y: {
-            formatter: (value) => `₹${value.toFixed(2)}`,
+            formatter: (value) => `${currencySymbol}${value.toFixed(2)}`,
           },
         },
       };
@@ -190,7 +191,6 @@ const StockChart = ({ symbol }) => {
 
   return (
     <Box sx={{ mt: 2 }}>
-      {/* Options & Controls */}
       <Box
         sx={{
           display: "flex",
@@ -238,7 +238,6 @@ const StockChart = ({ symbol }) => {
           </IconButton>
         </Tooltip>
       </Box>
-      {/* Render Chart */}
       <Chart
         key={chartType} // Force re-render when chartType changes
         options={options}

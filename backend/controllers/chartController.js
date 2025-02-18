@@ -1,9 +1,11 @@
 // backend/controllers/chartController.js
 const yahooFinance = require("yahoo-finance2").default;
 
-const fetchChartData = async (symbol, interval = '1d') => {
-  const period1 = new Date();
-  period1.setFullYear(period1.getFullYear() - 1); // 1-year history
+const fetchChartData = async (symbol, interval = "1d") => {
+  let period1;
+
+  period1 = new Date();
+  period1.setFullYear(period1.getFullYear() - 1);
 
   let chartData;
 
@@ -43,10 +45,12 @@ const fetchChartData = async (symbol, interval = '1d') => {
 
 const getChartData = async (req, res) => {
   const { symbol } = req.params;
-  const interval = req.query.interval || '1d'; // Use query param if provided
+  const interval = req.query.interval || "1d"; // Use query param if provided
   const chartData = await fetchChartData(symbol, interval);
   if (!chartData) {
-    return res.status(404).json({ error: "Chart data not found or invalid symbol" });
+    return res
+      .status(404)
+      .json({ error: "Chart data not found or invalid symbol" });
   }
   res.json(chartData);
 };
