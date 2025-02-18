@@ -1,7 +1,7 @@
 // src/components/StockChart.jsx
-import React, { useState } from 'react';
-import Chart from 'react-apexcharts';
-import useChartData from '../hooks/useChartData';
+import React, { useState } from "react";
+import Chart from "react-apexcharts";
+import useChartData from "../hooks/useChartData";
 import {
   Box,
   CircularProgress,
@@ -14,81 +14,108 @@ import {
   MenuItem,
   IconButton,
   Tooltip,
-} from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
+} from "@mui/material";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 
 const StockChart = ({ symbol }) => {
   // Default settings
-  const [chartType, setChartType] = useState('candlestick');
-  const [interval, setInterval] = useState('1d'); // Options: '1d', '1wk', '1mo'
-  const [theme, setTheme] = useState('dark'); // 'dark' or 'light'
+  const [chartType, setChartType] = useState("candlestick");
+  const [interval, setInterval] = useState("1d"); // Options: '1d', '1wk', '1mo'
+  const [theme, setTheme] = useState("light"); // 'dark' or 'light'
   const [refreshCounter, setRefreshCounter] = useState(0);
 
-  // Note: Ensure your useChartData hook accepts the refreshCounter as a dependency.
-  const { chartData, loading, error } = useChartData(symbol, interval, /* exchange */ "NSE", refreshCounter);
+  const { chartData, loading, error } = useChartData(
+    symbol,
+    interval,
+    "NSE",
+    refreshCounter
+  );
 
   // Toggle between dark and light themes
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
   // Trigger refresh by updating refreshCounter
   const handleRefresh = () => {
-    setRefreshCounter(prev => prev + 1);
+    setRefreshCounter((prev) => prev + 1);
   };
 
   if (loading) return <CircularProgress sx={{ mt: 2 }} />;
-  if (error) return <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>;
+  if (error)
+    return (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        {error}
+      </Alert>
+    );
   if (!chartData) return null;
 
   let options = {};
   let series = [];
 
-  if (chartType === 'candlestick') {
+  if (chartType === "candlestick") {
     // Prepare candlestick data (requires OHLC data in chartData.quotes)
     let seriesData = [];
     if (chartData.quotes) {
-      seriesData = chartData.quotes.map(q => ({
+      seriesData = chartData.quotes.map((q) => ({
         x: new Date(q.date),
-        y: [q.open, q.high, q.low, q.close],
+        y: [
+          parseFloat(q.open.toFixed(2)),
+          parseFloat(q.high.toFixed(2)),
+          parseFloat(q.low.toFixed(2)),
+          parseFloat(q.close.toFixed(2)),
+        ],
       }));
     } else {
-      return <Alert severity="error">Candlestick chart requires OHLC data in quotes format.</Alert>;
+      return (
+        <Alert severity="error">
+          Candlestick chart requires OHLC data in quotes format.
+        </Alert>
+      );
     }
 
     options = {
       chart: {
-        type: 'candlestick',
+        type: "candlestick",
         height: 350,
         zoom: { enabled: true },
         animations: { enabled: false },
         toolbar: { show: true },
-        background: theme === 'dark' ? '#1e1e1e' : '#fff',
+        background: theme === "dark" ? "#1e1e1e" : "#fff",
       },
       title: {
         text: `${symbol} Candlestick Chart`,
-        align: 'left',
-        style: { color: theme === 'dark' ? '#fff' : '#000' },
+        align: "left",
+        style: { color: theme === "dark" ? "#fff" : "#000" },
       },
       xaxis: {
-        type: 'datetime',
+        type: "datetime",
         labels: {
           datetimeUTC: false,
-          format: 'dd MMM',
-          style: { colors: theme === 'dark' ? '#fff' : '#000' },
+          format: "dd MMM",
+          style: { colors: theme === "dark" ? "#fff" : "#000" },
         },
       },
       yaxis: {
         tooltip: { enabled: true },
-        title: { text: 'Price (₹)', style: { color: theme === 'dark' ? '#fff' : '#000' } },
-        labels: { style: { colors: theme === 'dark' ? '#fff' : '#000' } },
+        title: {
+          text: "Price (₹)",
+          style: { color: theme === "dark" ? "#fff" : "#000" },
+        },
+        labels: {
+          style: { colors: theme === "dark" ? "#fff" : "#000" },
+          formatter: (value) => value.toFixed(2),
+        },
       },
       tooltip: {
         enabled: true,
         theme: theme,
-        x: { format: 'dd MMM yyyy' },
+        x: { format: "dd MMM yyyy" },
+        y: {
+          formatter: (value) => `₹${value.toFixed(2)}`,
+        },
       },
     };
 
@@ -98,60 +125,92 @@ const StockChart = ({ symbol }) => {
         data: seriesData,
       },
     ];
-  } else if (chartType === 'line') {
+  } else if (chartType === "line") {
     // Prepare line chart data (using closing prices)
     if (chartData.quotes) {
-      const categories = chartData.quotes.map(q => {
+      const categories = chartData.quotes.map((q) => {
         const date = new Date(q.date);
         return `${date.getDate()}/${date.getMonth() + 1}`;
       });
-      const closePrices = chartData.quotes.map(q => q.close);
+      const closePrices = chartData.quotes.map((q) =>
+        parseFloat(q.close.toFixed(2))
+      );
 
       options = {
         chart: {
-          type: 'line',
+          type: "line",
           zoom: { enabled: true },
           toolbar: { show: true },
-          background: theme === 'dark' ? '#1e1e1e' : '#fff',
+          background: theme === "dark" ? "#1e1e1e" : "#fff",
         },
         title: {
           text: `${symbol} Line Chart`,
-          align: 'left',
-          style: { color: theme === 'dark' ? '#fff' : '#000' },
+          align: "left",
+          style: { color: theme === "dark" ? "#fff" : "#000" },
         },
         xaxis: {
           categories: categories,
-          title: { text: 'Date', style: { color: theme === 'dark' ? '#fff' : '#000' } },
-          labels: { style: { colors: theme === 'dark' ? '#fff' : '#000' } },
+          title: {
+            text: "Date",
+            style: { color: theme === "dark" ? "#fff" : "#000" },
+          },
+          labels: { style: { colors: theme === "dark" ? "#fff" : "#000" } },
         },
         yaxis: {
-          title: { text: 'Price (₹)', style: { color: theme === 'dark' ? '#fff' : '#000' } },
-          labels: { style: { colors: theme === 'dark' ? '#fff' : '#000' } },
+          title: {
+            text: "Price (₹)",
+            style: { color: theme === "dark" ? "#fff" : "#000" },
+          },
+          labels: {
+            style: { colors: theme === "dark" ? "#fff" : "#000" },
+            formatter: (value) => value.toFixed(2),
+          },
         },
-        stroke: { curve: 'smooth' },
+        stroke: { curve: "smooth" },
         tooltip: {
           shared: true,
           intersect: false,
-          x: { show: true, format: 'dd/MM' },
+          x: { show: true, format: "dd/MM" },
           theme: theme,
+          y: {
+            formatter: (value) => `₹${value.toFixed(2)}`,
+          },
         },
       };
 
       series = [{ name: symbol, data: closePrices }];
     } else {
-      return <Alert severity="error">Unexpected chart data format for line chart.</Alert>;
+      return (
+        <Alert severity="error">
+          Unexpected chart data format for line chart.
+        </Alert>
+      );
     }
   }
 
   return (
     <Box sx={{ mt: 2 }}>
       {/* Options & Controls */}
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 2, mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          alignItems: "center",
+          gap: 2,
+          mb: 2,
+        }}
+      >
         <ButtonGroup variant="contained" aria-label="chart type toggle">
-          <Button onClick={() => setChartType('line')} color={chartType === 'line' ? 'primary' : 'inherit'}>
+          <Button
+            onClick={() => setChartType("line")}
+            color={chartType === "line" ? "primary" : "inherit"}
+          >
             Line
           </Button>
-          <Button onClick={() => setChartType('candlestick')} color={chartType === 'candlestick' ? 'primary' : 'inherit'}>
+          <Button
+            onClick={() => setChartType("candlestick")}
+            color={chartType === "candlestick" ? "primary" : "inherit"}
+          >
             Candlestick
           </Button>
         </ButtonGroup>
@@ -175,15 +234,16 @@ const StockChart = ({ symbol }) => {
         </Tooltip>
         <Tooltip title="Toggle Theme">
           <IconButton onClick={toggleTheme} color="primary">
-            {theme === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+            {theme === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
         </Tooltip>
       </Box>
       {/* Render Chart */}
       <Chart
+        key={chartType} // Force re-render when chartType changes
         options={options}
         series={series}
-        type={chartType === 'line' ? 'line' : 'candlestick'}
+        type={chartType === "line" ? "line" : "candlestick"}
         height={350}
       />
     </Box>

@@ -1,8 +1,9 @@
 // backend/server.js
 const express = require("express");
 const cors = require("cors");
+const yahooFinance = require("yahoo-finance2").default;
 
-const stockRoutes = require("./routes/stockRoutes"); // your existing stock routes
+const stockRoutes = require("./routes/stockRoutes");
 const chartRoutes = require("./routes/chartRoutes");
 const insightsRoutes = require("./routes/insightsRoutes");
 
@@ -23,3 +24,4 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

@@ -1,7 +1,7 @@
-import React, { useState, useEffect  } from 'react';
-import useStock from '../hooks/useStock';
-import CompanyOverview from './CompanyOverview'
-import StockChart from './StockChart';
+import React, { useState, useEffect } from "react";
+import useStock from "../hooks/useStock";
+import CompanyOverview from "./CompanyOverview";
+import StockChart from "./StockChart";
 import {
   TextField,
   Button,
@@ -11,21 +11,21 @@ import {
   FormControl,
   InputLabel,
   Select,
-  MenuItem
-} from '@mui/material';
+  MenuItem,
+} from "@mui/material";
 
 const StockDashboard = ({ initialSymbol, initialExchange, hideSearch }) => {
   // Local state for search values
-  const [inputSymbol, setInputSymbol] = useState(initialSymbol || '');
+  const [inputSymbol, setInputSymbol] = useState(initialSymbol || "");
   const [fetchSymbol, setFetchSymbol] = useState(initialSymbol || null);
-  const [exchange, setExchange] = useState(initialExchange || 'india');
+  const [exchange, setExchange] = useState(initialExchange || "india");
 
   // If hideSearch is true, update the local state when props change.
   useEffect(() => {
     if (hideSearch) {
-      setInputSymbol(initialSymbol || '');
+      setInputSymbol(initialSymbol || "");
       setFetchSymbol(initialSymbol || null);
-      setExchange(initialExchange || 'india');
+      setExchange(initialExchange || "india");
     }
   }, [initialSymbol, initialExchange, hideSearch]);
 
@@ -42,9 +42,24 @@ const StockDashboard = ({ initialSymbol, initialExchange, hideSearch }) => {
   };
 
   return (
-    <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-      { !hideSearch && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
+    <div
+      style={{
+        marginTop: "20px",
+        padding: "20px",
+        border: "1px solid #ddd",
+        borderRadius: "8px",
+      }}
+    >
+      {!hideSearch && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "10px",
+            marginBottom: "20px",
+            alignItems: "center",
+          }}
+        >
           <TextField
             label="Enter Stock Symbol"
             value={inputSymbol}
@@ -63,7 +78,11 @@ const StockDashboard = ({ initialSymbol, initialExchange, hideSearch }) => {
               <MenuItem value="us">US</MenuItem>
             </Select>
           </FormControl>
-          <Button onClick={handleFetchStock} variant="contained" color="primary">
+          <Button
+            onClick={handleFetchStock}
+            variant="contained"
+            color="primary"
+          >
             Get Stock Info
           </Button>
         </div>
@@ -78,11 +97,14 @@ const StockDashboard = ({ initialSymbol, initialExchange, hideSearch }) => {
             {stockData.shortName} ({stockData.symbol})
           </Typography>
           <Typography>
-            <strong>Current Price:</strong> ₹{stockData.regularMarketPrice}
+            <strong>Current Price:</strong> {stockData.currencySymbol}
+            {stockData.regularMarketPrice}
           </Typography>
           <Typography>
-            <strong>Market Cap:</strong> ₹{stockData.marketCap}
+            <strong>Market Cap:</strong> {stockData.currencySymbol}
+            {stockData.marketCap}
           </Typography>
+
           <StockChart symbol={fetchSymbol} exchange={exchange} />
           <CompanyOverview symbol={fetchSymbol} exchange={exchange} />
         </div>
